@@ -6,6 +6,7 @@ use App\Models\City;
 use App\Models\Province;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class LocationSeeder extends Seeder
 {
@@ -14,6 +15,7 @@ class LocationSeeder extends Seeder
      */
     public function run(): void
     {
+        Schema::disableForeignKeyConstraints();
         // Fetch provinces from the remote JSON file
         $client = new \GuzzleHttp\Client();
         $fetch = $client->getAsync('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json')
@@ -52,11 +54,12 @@ class LocationSeeder extends Seeder
                     ['code' => $city['id']],
                     [
                         'name' => $city['name'],
-                        'province_id' => Province::where('code', $province['id'])->first()->id
+                        'province_id' => $province['id']
                     ]
                 );
             }
         }
+        Schema::enableForeignKeyConstraints();
         echo "Provinces and cities seeded successfully.\n";   
     }
 }
